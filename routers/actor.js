@@ -4,7 +4,7 @@ const Movie = require('../models/movie');
 
 module.exports = {
     getAll: function (req, res) {
-        Actor.find(function (err, actors) {
+        Actor.find({}).populate('movies').exec(function (err, actors) {
             if (err) {
                 return res.status(404).json(err);
             } else {
@@ -62,8 +62,17 @@ module.exports = {
         Actor.findOne({ _id: req.params.id }, function (err, actor) {
             if (err) return res.status(400).json(err);
             if (!actor) return res.status(404).json();
-            Movie.deleteMany({ _id: { $in: actor.movies}});
-            Actor.deleteOne(actor);
+            Movie.deleteMany({ _id: { $in: actor.movies } }, function (err) {
+                if (err) {
+                    console.log(actor.movies);
+                    return res.status(500).json(err);
+                }
+            });
+            Actor.findByIdAndRemove(req.params.id, function (err) {
+                if (err) {
+                    return res.status(500).json(err);
+                }
+            });
             res.json();
         });
     },
