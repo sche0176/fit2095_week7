@@ -81,11 +81,9 @@ module.exports = {
     },
     deleteMoviesRangeYears: function (req, res) {
         let rangeOfYears = req.body;
-        Movie.find( {year: { $lte: rangeOfYears.year1, $gte: rangeOfYears.year2} }, function (err, movies) 
+        Movie.deleteMany( {year: { $lte: rangeOfYears.year1, $gte: rangeOfYears.year2} }, function (err) 
         {
-            if (err) return res.status(400).json(err);
-            if (!movies) return res.status(404).json();
-            Movie.deleteMany( { $in: movies } );
+            if (err) return res.status(500).json(err);
             res.json();
         });
     },
